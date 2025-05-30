@@ -1,18 +1,4 @@
 # Модификация проекта: Добавление напоминаний и админ-панели мастера
-## Код до модификации
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.utils import executor
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.dispatcher.filters import Text
-
-API_TOKEN = '7792032422:AAGUJAbT7VOt_E3zHdCG-tWkGbqRXckpbxY'
-
-bot = Bot(token=API_TOKEN)
-storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
 
 # Состояния
 class Booking(StatesGroup):
