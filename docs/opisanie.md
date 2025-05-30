@@ -153,12 +153,5 @@ StatesGroup: Booking
 ##  Полный код и документация
 
 Доступны в репозитории:
-👉 [GitHub — Practice Telegram Bot](https://github.com/kekwinka/Practice/blob/main/src/main.py)
+ [GitHub — Practice Telegram Bot](https://github.com/kekwinka/Practice/blob/main/src/main.py)
 
----
-
-
----
-
-Хочешь — могу сделать скриншоты интерфейса, схемы и вставить их как `![название](путь_к_картинке.png)` для GitHub.
-```
