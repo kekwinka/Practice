@@ -5,12 +5,17 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher.filters import Text
+import asyncio
+from datetime import datetime, timedelta
 
 API_TOKEN = '7792032422:AAGUJAbT7VOt_E3zHdCG-tWkGbqRXckpbxY'
+ADMIN_ID = 856435420
 
 bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
+
+appointments = []  # Список записей
 
 # Состояния
 class Booking(StatesGroup):
@@ -83,6 +88,15 @@ async def confirm_booking(message: types.Message, state: FSMContext):
     )
     await message.answer(text, parse_mode="HTML", reply_markup=confirm_kb)
 
+    # Сохраняем запись
+    appointments.append({
+        'user_id': message.from_user.id,
+        'user_name': message.from_user.full_name,
+        'service': data['service'],
+        'day': data['day'],
+        'time': datetime.strptime(f"{data['day']} {data['time']}", "%A %H:%M")  # Пример, нужно подогнать под реальные даты
+    })
+
 @dp.message_handler(Text(equals="🔁 Перенести запись"))
 async def reschedule(message: types.Message, state: FSMContext):
     await choose_service(message)
@@ -97,6 +111,35 @@ async def go_home(message: types.Message, state: FSMContext):
     await state.finish()
     await message.answer("Главное меню:", reply_markup=main_kb)
 
+@dp.message_handler(commands=['admin'])
+async def admin_panel(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer("У вас нет доступа к админ-панели.")
+        return
+    if not appointments:
+        await message.answer("Записей нет.")
+        return
+    text = "Текущие записи:\n"
+    for i, a in enumerate(appointments):
+        text += f"{i+1}. {a['user_name']} — {a['service']} — {a['time'].strftime('%A %H:%M')}\n"
+    await message.answer(text)
+
+# Напоминания
+async def notify_upcoming_appointments():
+    while True:
+        now = datetime.now()
+        for appointment in appointments:
+            time_diff = appointment['time'] - now
+            if timedelta(hours=23, minutes=59) < time_diff < timedelta(days=1, minutes=1):
+                await bot.send_message(
+                    appointment['user_id'],
+                    f"Напоминаем: у вас завтра запись на {appointment['service']} в {appointment['time'].strftime('%H:%M')}"
+                )
+        await asyncio.sleep(60)
+
 # Запуск
 if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.create_task(notify_upcoming_appointments())
     executor.start_polling(dp, skip_updates=True)
+
