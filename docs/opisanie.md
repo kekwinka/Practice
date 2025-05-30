@@ -146,12 +146,5 @@ StatesGroup: Booking
  ├── service
  ├── date
  └── time
-```
 
----
-
-##  Полный код и документация
-
-Доступны в репозитории:
- [GitHub — Practice Telegram Bot](https://github.com/kekwinka/Practice/blob/main/src/main.py)
 
